@@ -37,6 +37,7 @@ NSRegularExpression * escCharPattern();
 
 typedef NS_ENUM(NSUInteger, MCLogLevel) {
     MCLogLevelVerbose = 0x1000,
+    MCLogLevelDebug,
     MCLogLevelInfo,
     MCLogLevelWarn,
     MCLogLevelError
@@ -215,19 +216,22 @@ static const void *LogLevelAssociateKey;
     NSString *content = [logText substringFromIndex:prefixRange.length];
     NSString *originalContent = [ControlCharsPattern stringByReplacingMatchesInString:content options:0 range:NSMakeRange(0, content.length) withTemplate:@""];
     
-    if ([originalContent hasPrefix:@"-[VERBOSE]"]) {
+    if ([originalContent hasPrefix:@"VERBOSE"]) {
         [item setLogLevel:MCLogLevelVerbose];
+        content = [NSString stringWithFormat:(LC_ESC @"[37m%@" LC_RESET), content];
+    } else if ([originalContent hasPrefix:@"DEBUG"]) {
+        [item setLogLevel:MCLogLevelDebug];
         content = [NSString stringWithFormat:(LC_ESC @"[34m%@" LC_RESET), content];
     }
-    else if ([originalContent hasPrefix:@"-[INFO]"]) {
+    else if ([originalContent hasPrefix:@"INFO"]) {
         [item setLogLevel:MCLogLevelInfo];
         content = [NSString stringWithFormat:(LC_ESC @"[32m%@" LC_RESET), content];
     }
-    else if ([originalContent hasPrefix:@"-[WARN]"]) {
+    else if ([originalContent hasPrefix:@"WARN"]) {
         [item setLogLevel:MCLogLevelWarn];
         content = [NSString stringWithFormat:(LC_ESC @"[33m%@" LC_RESET), content];
     }
-    else if ([originalContent hasPrefix:@"-[ERROR]"]) {
+    else if ([originalContent hasPrefix:@"ERROR"]) {
         [item setLogLevel:MCLogLevelError];
         content = [NSString stringWithFormat:(LC_ESC @"[31m%@" LC_RESET), content];
     } else {
@@ -490,8 +494,8 @@ static void *kLastAttributeKey;
                 [attrs setObject:NSColorWithHexRGB(0x00ff00) forKey:NSForegroundColorAttributeName];
                 break;
                 
-            case 33: // Yellow
-                [attrs setObject:NSColorWithHexRGB(0xffff00) forKey:NSForegroundColorAttributeName];
+            case 33: // Orange
+                [attrs setObject:NSColorWithHexRGB(0xff9900) forKey:NSForegroundColorAttributeName];
                 break;
                 
             case 34: // Blue
@@ -522,8 +526,8 @@ static void *kLastAttributeKey;
                 [attrs setObject:NSColorWithHexRGB(0x00ff00) forKey:NSBackgroundColorAttributeName];
                 break;
                 
-            case 43: // Yellow
-                [attrs setObject:NSColorWithHexRGB(0xffff00) forKey:NSBackgroundColorAttributeName];
+            case 43: // Orange
+                [attrs setObject:NSColorWithHexRGB(0xff9900) forKey:NSBackgroundColorAttributeName];
                 break;
                 
             case 44: // Blue
@@ -763,6 +767,7 @@ static const void *kTimerKey;
     
     if(filterButton) {
         [self filterPopupButton:filterButton addItemWithTitle:@"Verbose" tag:MCLogLevelVerbose];
+        [self filterPopupButton:filterButton addItemWithTitle:@"Debug" tag:MCLogLevelDebug];
         [self filterPopupButton:filterButton addItemWithTitle:@"Info" tag:MCLogLevelInfo];
         [self filterPopupButton:filterButton addItemWithTitle:@"Warn" tag:MCLogLevelWarn];
         [self filterPopupButton:filterButton addItemWithTitle:@"Error" tag:MCLogLevelError];
