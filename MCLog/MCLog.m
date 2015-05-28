@@ -491,7 +491,7 @@ static void *kLastAttributeKey;
                 break;
                 
             case 32: // Green
-                [attrs setObject:NSColorWithHexRGB(0x00ff00) forKey:NSForegroundColorAttributeName];
+                [attrs setObject:NSColorWithHexRGB(0x00aa00) forKey:NSForegroundColorAttributeName];
                 break;
                 
             case 33: // Orange
@@ -523,7 +523,7 @@ static void *kLastAttributeKey;
                 break;
                 
             case 42: // Green
-                [attrs setObject:NSColorWithHexRGB(0x00ff00) forKey:NSBackgroundColorAttributeName];
+                [attrs setObject:NSColorWithHexRGB(0x00aa00) forKey:NSBackgroundColorAttributeName];
                 break;
                 
             case 43: // Orange
