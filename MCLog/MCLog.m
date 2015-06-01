@@ -9,6 +9,8 @@
 #import "MCLog.h"
 #import <objc/runtime.h>
 #include <execinfo.h>
+#import "MCSettingsViewController.h"
+#import "MCSettings.h"
 
 #define MCLOG_FLAG "MCLOG_FLAG"
 #define kTagSearchField	99
@@ -216,24 +218,24 @@ static const void *LogLevelAssociateKey;
     NSString *content = [logText substringFromIndex:prefixRange.length];
     NSString *originalContent = [ControlCharsPattern stringByReplacingMatchesInString:content options:0 range:NSMakeRange(0, content.length) withTemplate:@""];
     
-    if ([originalContent hasPrefix:@"VERBOSE"]) {
+    if ([originalContent hasPrefix:[MCSettings defaultSetting].verbosePrefix]) {
         [item setLogLevel:MCLogLevelVerbose];
-        content = [NSString stringWithFormat:(LC_ESC @"[37m%@" LC_RESET), content];
-    } else if ([originalContent hasPrefix:@"DEBUG"]) {
+        content = [NSString stringWithFormat:(LC_ESC @"[101m%@" LC_RESET), content];
+    } else if ([originalContent hasPrefix:[MCSettings defaultSetting].debugPrefix]) {
         [item setLogLevel:MCLogLevelDebug];
-        content = [NSString stringWithFormat:(LC_ESC @"[34m%@" LC_RESET), content];
+        content = [NSString stringWithFormat:(LC_ESC @"[102m%@" LC_RESET), content];
     }
-    else if ([originalContent hasPrefix:@"INFO"]) {
+    else if ([originalContent hasPrefix:[MCSettings defaultSetting].infoPrefix]) {
         [item setLogLevel:MCLogLevelInfo];
-        content = [NSString stringWithFormat:(LC_ESC @"[32m%@" LC_RESET), content];
+        content = [NSString stringWithFormat:(LC_ESC @"[103m%@" LC_RESET), content];
     }
-    else if ([originalContent hasPrefix:@"WARN"]) {
+    else if ([originalContent hasPrefix:[MCSettings defaultSetting].warningPrefix]) {
         [item setLogLevel:MCLogLevelWarn];
-        content = [NSString stringWithFormat:(LC_ESC @"[33m%@" LC_RESET), content];
+        content = [NSString stringWithFormat:(LC_ESC @"[104m%@" LC_RESET), content];
     }
-    else if ([originalContent hasPrefix:@"ERROR"]) {
+    else if ([originalContent hasPrefix:[MCSettings defaultSetting].errorPrefix]) {
         [item setLogLevel:MCLogLevelError];
-        content = [NSString stringWithFormat:(LC_ESC @"[31m%@" LC_RESET), content];
+        content = [NSString stringWithFormat:(LC_ESC @"[105m%@" LC_RESET), content];
     } else {
         static NSMutableArray *extraErrorPatterns = nil;
         if (extraErrorPatterns == nil) {
@@ -465,6 +467,7 @@ static void *kLastAttributeKey;
     NSArray *attrComponents = [ansiEscString componentsSeparatedByString:@";"];
     for (NSString *attrName in attrComponents) {
         NSUInteger attrCode = [attrName integerValue];
+        NSUInteger colorCode = 0;
         switch (attrCode) {
             case 0:
                 [attrs removeAllObjects];
@@ -545,7 +548,26 @@ static void *kLastAttributeKey;
             case 47: // gray
                 [attrs setObject:NSColorWithHexRGB(0x808080) forKey:NSBackgroundColorAttributeName];
                 break;
-                
+            case 101: // verbose
+                colorCode = [MCSettings defaultSetting].verboseColorCode.integerValue;
+                [attrs setObject:NSColorWithHexRGB(colorCode) forKey:NSForegroundColorAttributeName];
+                break;
+            case 102: // debug
+                colorCode = [MCSettings defaultSetting].debugColorCode.integerValue;
+                [attrs setObject:NSColorWithHexRGB(colorCode) forKey:NSForegroundColorAttributeName];
+                break;
+            case 103: // info
+                colorCode = [MCSettings defaultSetting].infoColorCode.integerValue;
+                [attrs setObject:NSColorWithHexRGB(colorCode) forKey:NSForegroundColorAttributeName];
+                break;
+            case 104: // warning
+                colorCode = [MCSettings defaultSetting].warningColorCode.integerValue;
+                [attrs setObject:NSColorWithHexRGB(colorCode) forKey:NSForegroundColorAttributeName];
+                break;
+            case 105: // error
+                colorCode = [MCSettings defaultSetting].errorColorCode.integerValue;
+                [attrs setObject:NSColorWithHexRGB(colorCode) forKey:NSForegroundColorAttributeName];
+                break;
             default:
                 break;
         }
@@ -660,6 +682,9 @@ static const void *kTimerKey;
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 @interface MCLog ()<NSTextFieldDelegate>
+
+@property (nonatomic, strong) MCSettingsViewController *settingPanel;
+
 @end
 
 @implementation MCLog
@@ -702,6 +727,7 @@ static const void *kTimerKey;
     self = [super init];
     if (self) {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activate:) name:@"IDEControlGroupDidChangeNotificationName" object:nil];
+        [self addMenuItem];
     }
     return self;
 }
@@ -852,6 +878,23 @@ static const void *kTimerKey;
 	[self addCustomViews];
 }
 
+- (void)addMenuItem {
+    NSMenuItem *editMenuItem = [[NSApp mainMenu] itemWithTitle:@"Window"];
+    if (editMenuItem) {
+        [[editMenuItem submenu] addItem:[NSMenuItem separatorItem]];
+        
+        NSMenuItem *newMenuItem = [[NSMenuItem alloc] initWithTitle:@"MCLog" action:@selector(showSettingPanel:) keyEquivalent:@""];
+        
+        [newMenuItem setTarget:self];
+        [[editMenuItem submenu] addItem:newMenuItem];
+    }
+}
+
+
+-(void) showSettingPanel:(NSNotification *)noti {
+    self.settingPanel = [[MCSettingsViewController alloc] initWithWindowNibName:@"MCSettingsViewController"];
+    [self.settingPanel showWindow:self.settingPanel];
+}
 @end
 
 #pragma mark - method hookers
