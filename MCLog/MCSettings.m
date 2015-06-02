@@ -72,7 +72,7 @@ NSString *const kMCLogLevelErrorColor = @"com.bge.MCLog.LogLevelSettings.Error.C
 - (NSString*)errorPrefix {
     return [[NSUserDefaults standardUserDefaults] stringForKey:kMCLogLevelErrorPrefix];
 }
-- (NSNumber*)erroeColorCode {
+- (NSNumber*)errorColorCode {
     return (NSNumber*)[[NSUserDefaults standardUserDefaults] objectForKey:kMCLogLevelErrorColor];
 }
 

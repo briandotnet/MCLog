@@ -727,7 +727,11 @@ static const void *kTimerKey;
     self = [super init];
     if (self) {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activate:) name:@"IDEControlGroupDidChangeNotificationName" object:nil];
-        [self addMenuItem];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidFinishLaunching:)
+                                                     name:NSApplicationDidFinishLaunchingNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -872,9 +876,11 @@ static const void *kTimerKey;
 	}
 #pragma clang diagnostic pop
 }
+- (void) applicationDidFinishLaunching: (NSNotification*) noti {
+    [self addMenuItem];
+}
 
-- (void)activate:(NSNotification *)notification
-{
+- (void)activate:(NSNotification *)notification {
 	[self addCustomViews];
 }
 
