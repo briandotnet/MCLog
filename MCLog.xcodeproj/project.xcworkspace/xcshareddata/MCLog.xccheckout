@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>1782F4AA-E26F-4A1C-B37B-2EEB0346A84B</string>
 	<key>IDESourceControlProjectName</key>
-	<string>MCLog</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>22F9C8F305497B927E2040B29E0DB7F039F7B3DB</key>
 		<string>https://github.com/briandotnet/MCLog.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>MCLog.xcodeproj</string>
+	<string>MCLog.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>22F9C8F305497B927E2040B29E0DB7F039F7B3DB</key>
